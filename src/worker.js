@@ -1,6 +1,7 @@
 import { pipeline, WhisperTextStreamer } from "@huggingface/transformers";
-const WebSocket = require('ws');
-const ws = new WebSocket('ws://localhost:ws_port');
+
+// Remove WebSocket-related code if not needed
+// const ws = new WebSocket('ws://localhost:8080');
 
 // Define model factories
 // Ensures only one model is created of each type

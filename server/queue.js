@@ -1,9 +1,17 @@
-const ffmpeg = require('./ffmpeg');
+import ffmpeg from './ffmpeg.js';
 
 class Queue {
   constructor() {
     this.queue = [];
     this.processing = false;
+  }
+
+  getStatus() {
+    return {
+      queueLength: this.queue.length,
+      isProcessing: this.processing,
+      currentQueue: this.queue
+    };
   }
 
   add(filePath) {
@@ -16,12 +24,10 @@ class Queue {
     this.processing = true;
     const filePath = this.queue.shift();
     try {
-      const audio = await ffmpeg.extractAudio(filePath);
-      // Add transcription logic here
-      // Notify via WebSocket
+      // Add processing logic here
+      console.log('Processing:', filePath);
     } catch (error) {
       console.error('Processing error:', error);
-      // Retry mechanism or fallback processing
     } finally {
       this.processing = false;
       this.processQueue();
@@ -29,4 +35,4 @@ class Queue {
   }
 }
 
-module.exports = new Queue();
+export const queue = new Queue();

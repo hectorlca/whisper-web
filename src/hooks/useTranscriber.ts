@@ -1,7 +1,6 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useWorker } from "./useWorker";
 import Constants from "../utils/Constants";
-import { WebSocket } from 'ws';
 
 interface ProgressItem {
     file: string;

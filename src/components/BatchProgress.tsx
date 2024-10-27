@@ -1,5 +1,3 @@
-import React from 'react';
-
 function BatchProgress() {
   // Implementation to display batch processing progress
 

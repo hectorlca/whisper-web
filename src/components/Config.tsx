@@ -1,5 +1,3 @@
-import React from 'react';
-
 function Config() {
   // Add directory configuration
   // Add processing options

@@ -1,9 +1,13 @@
-const ffmpeg = require('fluent-ffmpeg');
-const path = require('path');
+import ffmpeg from 'fluent-ffmpeg';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function extractAudio(filePath) {
   return new Promise((resolve, reject) => {
-    const outputPath = path.join('output', `${path.basename(filePath, path.extname(filePath))}.wav`);
+    const outputPath = path.join(__dirname, '../output', `${path.basename(filePath, path.extname(filePath))}.wav`);
     ffmpeg(filePath)
       .noVideo()
       .audioCodec('pcm_s16le')
@@ -14,4 +18,4 @@ function extractAudio(filePath) {
   });
 }
 
-module.exports = { extractAudio };
+export default { extractAudio };
