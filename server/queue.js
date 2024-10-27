@@ -1,38 +1,57 @@
 import ffmpeg from './ffmpeg.js';
+import { broadcastMessage } from './websocket.js';
+import Queue from 'bull';
+import { transcribeAudio } from './transcription.js';  // Make sure this import matches the export
 
-class Queue {
-  constructor() {
-    this.queue = [];
-    this.processing = false;
-  }
-
-  getStatus() {
-    return {
-      queueLength: this.queue.length,
-      isProcessing: this.processing,
-      currentQueue: this.queue
-    };
-  }
-
-  add(filePath) {
-    this.queue.push(filePath);
-    this.processQueue();
-  }
-
-  async processQueue() {
-    if (this.processing || this.queue.length === 0) return;
-    this.processing = true;
-    const filePath = this.queue.shift();
-    try {
-      // Add processing logic here
-      console.log('Processing:', filePath);
-    } catch (error) {
-      console.error('Processing error:', error);
-    } finally {
-      this.processing = false;
-      this.processQueue();
+const transcriptionQueue = new Queue('transcription', {
+    redis: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT || 6379
     }
-  }
-}
+});
 
-export const queue = new Queue();
+// Process queue items
+transcriptionQueue.process(async (job) => {
+    try {
+        const { filePath } = job.data;
+        
+        // Update status
+        broadcastMessage({
+            type: 'TRANSCRIPTION_STATUS',
+            payload: {
+                filePath,
+                status: 'processing'
+            }
+        });
+
+        // Perform transcription
+        const result = await transcribeAudio(filePath);
+
+        // Broadcast success
+        broadcastMessage({
+            type: 'TRANSCRIPTION_COMPLETE',
+            payload: {
+                filePath,
+                transcript: result
+            }
+        });
+
+        return result;
+    } catch (error) {
+        console.error('Transcription error:', error);
+        broadcastMessage({
+            type: 'TRANSCRIPTION_ERROR',
+            payload: {
+                filePath: job.data.filePath,
+                error: error.message
+            }
+        });
+        throw error;
+    }
+});
+
+export const addToQueue = async (data) => {
+    return await transcriptionQueue.add(data);
+};
+
+export const queue = transcriptionQueue;

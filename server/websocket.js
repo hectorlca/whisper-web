@@ -1,4 +1,4 @@
-import { WebSocketServer } from 'ws';
+import WebSocket, { WebSocketServer } from 'ws';
 import { queue } from './queue.js';  // Note: Make sure queue.js is also using ES modules
 
 const wss = new WebSocketServer({ 
@@ -16,6 +16,19 @@ const wss = new WebSocketServer({
 wss.on('error', function error(error) {
   console.error('WebSocket Server Error:', error);
 });
+
+// Add broadcast function
+export function broadcastMessage(message) {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      try {
+        client.send(JSON.stringify(message));
+      } catch (error) {
+        console.error('Error broadcasting message:', error);
+      }
+    }
+  });
+}
 
 wss.on('connection', function connection(ws, request) {
   console.log('New client connected from:', request.socket.remoteAddress);
@@ -44,7 +57,10 @@ wss.on('connection', function connection(ws, request) {
       }
       
       // Broadcast updates to all clients
-      broadcastStatus();
+      broadcastMessage({
+        type: 'QUEUE_STATUS',
+        data: queue.getStatus()
+      });
     } catch (error) {
       console.error('Error handling message:', error);
     }
@@ -59,19 +75,4 @@ wss.on('connection', function connection(ws, request) {
   });
 });
 
-function broadcastStatus() {
-  wss.clients.forEach(function each(client) {
-    if (client.readyState === WebSocketServer.OPEN) {
-      try {
-        client.send(JSON.stringify({
-          type: 'QUEUE_STATUS',
-          data: queue.getStatus()
-        }));
-      } catch (error) {
-        console.error('Error broadcasting status:', error);
-      }
-    }
-  });
-}
-
-export { wss, broadcastStatus };
+export { wss };
