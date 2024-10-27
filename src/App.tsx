@@ -1,6 +1,11 @@
+import React from 'react';
 import { AudioManager } from "./components/AudioManager";
 import Transcript from "./components/Transcript";
 import { useTranscriber } from "./hooks/useTranscriber";
+import Config from "./components/Config";
+import DirectoryStatus from "./components/DirectoryStatus";
+import QueueStatus from "./components/QueueStatus";
+import BatchProgress from "./components/BatchProgress";
 
 // @ts-ignore
 const IS_WEBGPU_AVAILABLE = !!navigator.gpu;
@@ -19,6 +24,10 @@ function App() {
                 </h2>
                 <AudioManager transcriber={transcriber} />
                 <Transcript transcribedData={transcriber.output} />
+                <Config />
+                <DirectoryStatus />
+                <QueueStatus />
+                <BatchProgress />
             </div>
 
             <div className='absolute bottom-4'>

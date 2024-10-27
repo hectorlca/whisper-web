@@ -1,5 +1,6 @@
- 
 import { pipeline, WhisperTextStreamer } from "@huggingface/transformers";
+const WebSocket = require('ws');
+const ws = new WebSocket('ws://localhost:ws_port');
 
 // Define model factories
 // Ensures only one model is created of each type
@@ -29,6 +30,26 @@ class PipelineFactory {
         }
 
         return this.instance;
+    }
+
+    // Add batch processing support
+    createBatchPipeline(files) {
+        // Implementation for handling batch processing
+    }
+
+    // Add memory management
+    manageMemory(file) {
+        // Implementation for memory monitoring and management
+    }
+
+    // Enhance progress tracking
+    trackProgress(file, progress) {
+        const update = {
+            filePath: file.path,
+            progress: progress,
+            status: 'processing'
+        };
+        ws.send(JSON.stringify(update));
     }
 }
 

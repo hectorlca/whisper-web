@@ -1,0 +1,7 @@
+{
+  "WATCH_DIRECTORIES": "dir1,dir2",
+  "OUTPUT_DIRECTORY": "output",
+  "ALLOWED_EXTENSIONS": "mp4,avi,mov,mp3,wav",
+  "GPU_MEMORY_LIMIT": 4096,
+  // ... other default configurations ...
+}
